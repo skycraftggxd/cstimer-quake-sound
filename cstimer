@@ -1,0 +1,68 @@
+// ==UserScript==
+// @name         csTimer Quake Announcer
+// @namespace    http://tampermonkey.net/
+// @version      2.0
+// @description  Quake announcer sounds for completed solves
+// @match        https://cstimer.net/*
+// @match        https://*.cstimer.net/*
+// @grant        none
+// ==/UserScript==
+
+(function () {
+    'use strict';
+
+    const BASE_URL =
+        "https://raw.githubusercontent.com/YOUR_USERNAME/quake_mp3_pack/main/";
+
+    const TIERS = [
+        { max: 13, file: "godlike.mp3" },
+        { max: 14, file: "holyshit.mp3" },
+        { max: 15, file: "domination.mp3" },
+        { max: 16, file: "rampage.mp3" },
+        { max: 18, file: "impressive.mp3" },
+        { max: 20, file: "perfect.mp3" }
+    ];
+
+    let lastAnnounced = "";
+
+    function playSound(file) {
+        const audio = new Audio(BASE_URL + file);
+        audio.volume = 1.0;
+        audio.play().catch(console.error);
+    }
+
+    function getTimeFromText(text) {
+        const match = text.match(/^(\d+(?:\.\d+)?)$/);
+        return match ? parseFloat(match[1]) : null;
+    }
+
+    function checkSolve() {
+        const lcd = document.getElementById("lcd");
+        if (!lcd) return;
+
+        const text = lcd.textContent.trim();
+
+        // Ignore duplicates
+        if (text === lastAnnounced) return;
+
+        const time = getTimeFromText(text);
+        if (time === null) return;
+
+        // Ignore impossible times
+        if (time < 3 || time > 120) return;
+
+        lastAnnounced = text;
+
+        for (const tier of TIERS) {
+            if (time < tier.max) {
+                console.log(`Solve ${time}s -> ${tier.file}`);
+                playSound(tier.file);
+                break;
+            }
+        }
+    }
+
+    setInterval(checkSolve, 500);
+
+    console.log("csTimer Quake Announcer loaded");
+})();
