@@ -12,7 +12,7 @@
     'use strict';
 
     const BASE_URL =
-        "https://raw.githubusercontent.com/YOUR_USERNAME/quake_mp3_pack/main/";
+        "https://github.com/skycraftggxd/cstimer-quake-sound/blob/main/cstimer";
 
     const TIERS = [
         { max: 13, file: "godlike.mp3" },
